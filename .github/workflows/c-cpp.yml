@@ -19,7 +19,8 @@ jobs:
           arch: x64
 
       - name: Compile Project
-        run: cl /EHsc /O2 /Fe:NextSNESControllerTool.exe src\main.cpp src\xml_parser.cpp src\http_client.cpp src\usb_device.cpp /I src user32.lib gdi32.lib winhttp.lib setupapi.lib hid.lib cfgmgr32.lib
+        # ВАЖНО: Добавлен флаг /DUNICODE для исправления ошибок C2664 (конфликт wchar_t и LPCSTR)
+        run: cl /EHsc /O2 /DUNICODE /Fe:NextSNESControllerTool.exe src\main.cpp src\xml_parser.cpp src\http_client.cpp src\usb_device.cpp /I src user32.lib gdi32.lib winhttp.lib setupapi.lib hid.lib cfgmgr32.lib
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
