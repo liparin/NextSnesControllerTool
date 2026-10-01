@@ -14,17 +14,7 @@ jobs:
       - uses: microsoft/setup-msbuild@v1
       - name: Compile
         shell: cmd
-        run: |
-          for /f "tokens=*" %%i in ('dir /b /s /a-d "C:\Program Files\Microsoft Visual Studio\*\VC\Auxiliary\Build\vcvarsall.bat"') do set "VCVARS=%%i"
-          if not defined VCVARS exit /b 1
-          call "%VCVARS%" x64 && ^
-          cl /EHsc /O2 /Fe:NextSNESControllerTool.exe ^
-            src\main.cpp ^
-            src\xml_parser.cpp ^
-            src\http_client.cpp ^
-            src\usb_device.cpp ^
-            /I src ^
-            user32.lib gdi32.lib winhttp.lib setupapi.lib hid.lib cfgmgr32.lib
+        run: for /f "tokens=*" %%i in ('dir /b /s /a-d "C:\Program Files\Microsoft Visual Studio\*\VC\Auxiliary\Build\vcvarsall.bat"') do set "VCVARS=%%i" && if not defined VCVARS exit /b 1 && call "%%VCVARS%% x64" && cl /EHsc /O2 /Fe:NextSNESControllerTool.exe src\main.cpp src\xml_parser.cpp src\http_client.cpp src\usb_device.cpp /I src user32.lib gdi32.lib winhttp.lib setupapi.lib hid.lib cfgmgr32.lib
       - uses: actions/upload-artifact@v4
         with:
           name: NextSNESControllerTool-Windows
