@@ -12,20 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup MSVC Dev Cmd
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
+      - name: Setup MSVC
+        uses: microsoft/setup-msbuild@v1
 
       - name: Compile
-        run: |
-          cl /EHsc /O2 /Fe:NextSNESControllerTool.exe ^
-             src\main.cpp ^
-             src\xml_parser.cpp ^
-             src\http_client.cpp ^
-             src\usb_device.cpp ^
-             /I src ^
-             user32.lib gdi32.lib winhttp.lib setupapi.lib hid.lib cfgmgr32.lib
+        shell: cmd
+        run: cl /EHsc /O2 /Fe:NextSNESControllerTool.exe src\main.cpp src\xml_parser.cpp src\http_client.cpp src\usb_device.cpp /I src user32.lib gdi32.lib winhttp.lib setupapi.lib hid.lib cfgmgr32.lib
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
