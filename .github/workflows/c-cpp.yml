@@ -1,23 +1,38 @@
-name: C/C++ CI
+name: Build NextSNESControllerTool
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
-
+    runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: configure
-      run: ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC (Visual Studio Build Tools)
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Compile with cl.exe
+        shell: cmd
+        run: |
+          echo Compiling main.cpp, xml_parser.cpp, http_client.cpp, usb_device.cpp...
+          cl /EHsc /O2 /Fe:NextSNESControllerTool.exe ^
+             src\main.cpp ^
+             src\xml_parser.cpp ^
+             src\http_client.cpp ^
+             src\usb_device.cpp ^
+             /I src ^
+             user32.lib gdi32.lib winhttp.lib setupapi.lib hid.lib cfgmgr32.lib
+
+      - name: Verify executable exists
+        run: if not exist NextSNESControllerTool.exe exit /b 1
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NextSNESControllerTool-Windows
+          path: NextSNESControllerTool.exe
