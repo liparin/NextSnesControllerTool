@@ -10,29 +10,22 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup MSVC (Visual Studio Build Tools)
-        uses: microsoft/setup-msbuild@v1
-
-      - name: Compile with cl.exe
+      - uses: actions/checkout@v4
+      - uses: microsoft/setup-msbuild@v1
+      - name: Compile
         shell: cmd
         run: |
-          echo Compiling main.cpp, xml_parser.cpp, http_client.cpp, usb_device.cpp...
+          for /f "tokens=*" %%i in ('dir /b /s /a-d "C:\Program Files\Microsoft Visual Studio\*\VC\Auxiliary\Build\vcvarsall.bat"') do set "VCVARS=%%i"
+          if not defined VCVARS exit /b 1
+          call "%VCVARS%" x64 && ^
           cl /EHsc /O2 /Fe:NextSNESControllerTool.exe ^
-             src\main.cpp ^
-             src\xml_parser.cpp ^
-             src\http_client.cpp ^
-             src\usb_device.cpp ^
-             /I src ^
-             user32.lib gdi32.lib winhttp.lib setupapi.lib hid.lib cfgmgr32.lib
-
-      - name: Verify executable exists
-        run: if not exist NextSNESControllerTool.exe exit /b 1
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+            src\main.cpp ^
+            src\xml_parser.cpp ^
+            src\http_client.cpp ^
+            src\usb_device.cpp ^
+            /I src ^
+            user32.lib gdi32.lib winhttp.lib setupapi.lib hid.lib cfgmgr32.lib
+      - uses: actions/upload-artifact@v4
         with:
           name: NextSNESControllerTool-Windows
           path: NextSNESControllerTool.exe
