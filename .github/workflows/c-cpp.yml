@@ -19,8 +19,14 @@ jobs:
           arch: x64
 
       - name: Compile Project
-        # ВАЖНО: Добавлен флаг /DUNICODE для исправления ошибок C2664 (конфликт wchar_t и LPCSTR)
-        run: cl /EHsc /O2 /DUNICODE /Fe:NextSNESControllerTool.exe src\main.cpp src\xml_parser.cpp src\http_client.cpp src\usb_device.cpp /I src user32.lib gdi32.lib winhttp.lib setupapi.lib hid.lib cfgmgr32.lib
+        run: |
+          # 1. Сначала превращаем resource.rc в ресурс (resource.res)
+          rc /fo resource.res resource.rc
+          
+          # 2. Собираем exe. 
+          # ВАЖНО: resource.res стоит в списке файлов, иначе иконки не будет.
+          # Флаг /DUNICODE обязателен для работы с wchar_t (строки в Windows)
+          cl /EHsc /O2 /DUNICODE /Fe:NextSNESControllerTool.exe src\main.cpp src\xml_parser.cpp src\http_client.cpp src\usb_device.cpp resource.res /I src user32.lib gdi32.lib winhttp.lib setupapi.lib hid.lib cfgmgr32.lib
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
